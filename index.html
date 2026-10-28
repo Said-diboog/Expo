@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AED I - Sustentación Interactiva & Depuración C++</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #090d16; color: #f1f5f9; }
+    .glass-card { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+    .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+    .glow-blue { box-shadow: 0 0 25px rgba(14, 165, 233, 0.25); }
+    .code-line { transition: all 0.2s ease; }
+    .code-line:hover { background: rgba(255, 255, 255, 0.05); }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col custom-scrollbar selection:bg-sky-500 selection:text-white">
+
+  <!-- TOP NAVBAR -->
+  <header class="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-50 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/30">
+          <i class="fa-solid fa-code"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base text-white tracking-wide">AED I • UNAJ 2026-II</h1>
+          <p class="text-xs text-sky-400 font-mono">Prof. Dr. Ivar Vargas Belizario</p>
+        </div>
+      </div>
+      
+      <!-- NAVIGATION TABS -->
+      <nav class="hidden md:flex gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+        <button onclick="switchTab('q1')" id="tab-q1" class="tab-btn active px-4 py-2 rounded-lg text-xs font-semibold transition-all bg-sky-600 text-white shadow-md">
+          <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Q1: Búsquedas
+        </button>
+        <button onclick="switchTab('q2')" id="tab-q2" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+          <i class="fa-solid fa-arrow-down-short-wide mr-1.5"></i> Q2: Bubble Sort
+        </button>
+        <button onclick="switchTab('q3')" id="tab-q3" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+          <i class="fa-solid fa-gem mr-1.5"></i> Q3: UVa 10474
+        </button>
+        <button onclick="switchTab('glosario')" id="tab-glosario" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+          <i class="fa-solid fa-book-bookmark mr-1.5"></i> Glosario C++
+        </button>
+      </nav>
+
+      <div class="text-right hidden sm:block">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sustentación Lista
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ==================== TAB Q1: BÚSQUEDAS ==================== -->
+    <section id="content-q1" class="space-y-6">
+      
+      <!-- HERO BANNER Q1 -->
+      <div class="glass-card rounded-2xl p-6 border-l-4 border-l-sky-500 relative overflow-hidden">
+        <div class="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-sky-500/10 to-transparent pointer-events-none"></div>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-mono font-bold text-sky-400 uppercase tracking-widest bg-sky-500/10 px-2.5 py-1 rounded-md border border-sky-500/20">Pregunta 1 </span>
+            <h2 class="text-2xl font-bold text-white mt-2">Análisis y Corrección: Búsqueda Secuencial vs Binaria</h2>
+            <p class="text-slate-400 text-sm mt-1 max-width:700px">
+              <b>Enunciado:</b> Localizar el número <span class="font-mono text-amber-400 font-bold">x = 25</span> en el arreglo ordenado <span class="font-mono text-emerald-400 font-bold">A = {3, 7, 12, 18, 25, 31, 40}</span> de $n=7$ elementos.
+            </p>
+          </div>
+          <!-- TOGGLE VIEW MODE -->
+          <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
+            <button onclick="toggleQ1Mode('bugged')" id="q1-btn-bugged" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-500/20 text-red-400 border border-red-500/30">
+              <i class="fa-solid fa-bug mr-1"></i> Ver Código Con Errores
+            </button>
+            <button onclick="toggleQ1Mode('fixed')" id="q1-btn-fixed" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
+              <i class="fa-solid fa-circle-check mr-1"></i> Ver Código Corregido
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN WORKSPACE GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- LEFT: CODE EDITOR VIEW (7 COLUMNS) -->
+        <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden flex flex-col border border-slate-800">
+          <!-- EDITOR HEADER -->
+          <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              <span class="text-xs font-mono text-slate-400 ml-2" id="q1-file-title">Evaluacion_Q1_Defectuoso.cpp</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400" id="q1-status-badge">5 ERRORES LÓGICOS</span>
+          </div>
+
+          <!-- CODE AREA -->
+          <div class="p-4 font-mono text-xs overflow-x-auto bg-slate-950/60 leading-relaxed custom-scrollbar flex-1" id="q1-code-container">
+            <!-- DYNAMIC CODE CONTENT GENERATED BY JS -->
+          </div>
+        </div>
+
+        <!-- RIGHT: INTERACTIVE ERROR DIAGNOSTICS & CONCEPT EXPLAINER (5 COLUMNS) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 h-full flex flex-col">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <i class="fa-solid fa-microscope text-sky-400"></i> Panel de Diagnóstico e Inspección
+            </h3>
+
+            <p class="text-xs text-slate-400 mt-3">
+              Haz clic sobre los puntos marcados con <span class="text-red-400 font-bold">[!]</span> en el código para entender qué hace la palabra clave y por qué rompía la lógica.
+            </p>
+
+            <!-- DIAGNOSTIC DETAILS DISPLAY AREA -->
+            <div id="q1-diagnostic-card" class="mt-4 p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 flex-1">
+              <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <i class="fa-solid fa-hand-pointer"></i> Selecciona un punto de error
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Examina los componentes clave: <code class="text-sky-300">for</code>, <code class="text-sky-300">else</code>, <code class="text-sky-300">return</code>, <code class="text-sky-300">while</code> y la llamada de parámetros en <code class="text-sky-300">main()</code>.
+              </p>
+            </div>
+
+            <!-- SIMULATOR VISUALIZER MINI-TOOL -->
+            <div class="mt-4 pt-4 border-t border-slate-800/80">
+              <h4 class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
+                <span>Simulador de Búsqueda Binaria</span>
+                <span class="text-[10px] text-sky-400 font-mono">A[4] = 25</span>
+              </h4>
+              <div class="grid grid-cols-7 gap-1 text-center font-mono text-xs">
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">3<br><span class="text-[9px] text-slate-500">[0]</span></div>
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">7<br><span class="text-[9px] text-slate-500">[1]</span></div>
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">12<br><span class="text-[9px] text-slate-500">[2]</span></div>
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">18<br><span class="text-[9px] text-slate-500">[3]</span></div>
+                <div class="p-2 bg-sky-500/20 rounded border border-sky-500/50 text-sky-300 font-bold glow-blue">25<br><span class="text-[9px] text-sky-400">[4]</span></div>
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">31<br><span class="text-[9px] text-slate-500">[5]</span></div>
+                <div class="p-2 bg-slate-800/80 rounded border border-slate-700 text-slate-400">40<br><span class="text-[9px] text-slate-500">[6]</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB Q2: BUBBLE SORT ==================== -->
+    <section id="content-q2" class="space-y-6 hidden">
+      
+      <!-- HERO BANNER Q2 -->
+      <div class="glass-card rounded-2xl p-6 border-l-4 border-l-emerald-500 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">Pregunta 2</span>
+            <h2 class="text-2xl font-bold text-white mt-2">Ordenamiento por Burbuja (Bubble Sort)</h2>
+            <p class="text-slate-400 text-sm mt-1">
+              <b>Objetivo:</b> Ordenar de menor a mayor las notas <span class="font-mono text-amber-400 font-bold">A = {15, 8, 20, 4, 12}</span>.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+            <button onclick="toggleQ2Mode('bugged')" id="q2-btn-bugged" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-500/20 text-red-400 border border-red-500/30">
+              <i class="fa-solid fa-bug mr-1"></i> Código Defectuoso
+            </button>
+            <button onclick="toggleQ2Mode('fixed')" id="q2-btn-fixed" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
+              <i class="fa-solid fa-circle-check mr-1"></i> Código Corregido
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- CODE EDITOR Q2 -->
+        <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden flex flex-col border border-slate-800">
+          <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+              <span class="text-xs font-mono text-slate-400" id="q2-file-title">BubbleSort_Defectuoso.cpp</span>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400" id="q2-status-badge">3 ERRORES CLAVE</span>
+          </div>
+          <div class="p-4 font-mono text-xs overflow-x-auto bg-slate-950/60 leading-relaxed custom-scrollbar flex-1" id="q2-code-container">
+            <!-- DYNAMIC CONTENT -->
+          </div>
+        </div>
+
+        <!-- DIAGNOSTIC & INTERACTIVE SWAP DEMO -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 h-full flex flex-col">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <i class="fa-solid fa-arrow-rotate-left text-emerald-400"></i> Mecánica de Intercambio (Swap)
+            </h3>
+
+            <div id="q2-diagnostic-card" class="mt-4 p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3 flex-1">
+              <div class="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <i class="fa-solid fa-hand-pointer"></i> Toca un error en el código
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Descubre por qué <code class="text-emerald-300">temp</code> es vital para no perder datos en memoria y cómo los signos <code class="text-emerald-300">&gt;</code> vs <code class="text-emerald-300">&lt;</code> dictan el sentido del ordenamiento.
+              </p>
+            </div>
+
+            <!-- ANIMATED SWAP DEMO -->
+            <div class="mt-4 pt-4 border-t border-slate-800/80">
+              <h4 class="text-xs font-bold text-slate-300 mb-2">Simulador de Intercambio con Variable <span class="font-mono text-sky-400">temp</span></h4>
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2 font-mono text-xs">
+                <div class="flex items-center justify-between text-slate-400">
+                  <span>Paso 1: Respaldar</span>
+                  <span class="text-sky-400">temp = A[j] (15)</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-400">
+                  <span>Paso 2: Sobrescribir</span>
+                  <span class="text-amber-400">A[j] = A[j+1] (8)</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-400">
+                  <span>Paso 3: Recuperar</span>
+                  <span class="text-emerald-400">A[j+1] = temp (15)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB Q3: UVA 10474 ==================== -->
+    <section id="content-q3" class="space-y-6 hidden">
+      
+      <!-- HERO BANNER Q3 -->
+      <div class="glass-card rounded-2xl p-6 border-l-4 border-l-purple-500 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest bg-purple-500/10 px-2.5 py-1 rounded-md border border-purple-500/20">Pregunta 3</span>
+            <h2 class="text-2xl font-bold text-white mt-2">Where is the Marble? (UVa 10474)</h2>
+            <p class="text-slate-400 text-sm mt-1">
+              <b>Restricción Estricta:</b> Prohibido usar librerías avanzadas como <code class="text-purple-300">sort()</code>, <code class="text-purple-300">binary_search()</code> o <code class="text-purple-300">lower_bound()</code>.
+            </p>
+          </div>
+          <div class="text-xs font-mono bg-purple-950/60 border border-purple-800/60 p-3 rounded-xl text-purple-200">
+            Reto: Localizar la <b>PRIMERA posición</b> de valores duplicados (1-indexed).
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN Q3 WORKSPACE -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- FULL CODE Q3 -->
+        <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden border border-slate-800 flex flex-col">
+          <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">WhereIsTheMarble_Solution.cpp</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">C++ Puro Solución</span>
+          </div>
+          <div class="p-4 font-mono text-xs overflow-x-auto bg-slate-950/60 leading-relaxed custom-scrollbar flex-1" id="q3-code-container">
+            <!-- CODE LOADED VIA JS -->
+          </div>
+        </div>
+
+        <!-- EXPLANATION OF DUPLICATES HANDLING -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+            <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+              <i class="fa-solid fa-diagram-project text-purple-400"></i> ¿Cómo capturamos la Primera Aparición?
+            </h3>
+
+            <div class="space-y-3 text-xs text-slate-300">
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <span class="font-bold text-purple-400">1. Búsqueda Binaria Estándar vs Modificada</span>
+                <p class="text-slate-400">
+                  La búsqueda normal se detiene apenas encuentra una coincidencia. Si las canicas son <code class="text-amber-300">[1, 3, 3, 3, 5]</code>, se detendría en el índice 2 (el 3 del medio).
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <span class="font-bold text-emerald-400">2. Nuestra Estrategia Lógica</span>
+                <p class="text-slate-400">
+                  Al hallar <code class="text-emerald-300">A[medio] == x</code>, guardamos <code class="text-emerald-300">posicion = medio</code> y forzamos al algoritmo a seguir hacia la izquierda con <code class="text-emerald-300">derecha = medio - 1</code>.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+                <span class="font-bold text-sky-400">3. Conversión de Índices (0-based a 1-based)</span>
+                <p class="text-slate-400">
+                  Como C++ cuenta desde <code class="text-sky-300">0</code> y UVa exige contar desde <code class="text-sky-300">1</code>, al imprimir sumamos <code class="text-sky-300">posicion + 1</code>.
+                </p>
+              </div>
+            </div>
+
+            <!-- LIVE TEST CASE INPUT/OUTPUT DISPLAY -->
+            <div class="pt-3 border-t border-slate-800">
+              <h4 class="text-xs font-bold text-slate-300 mb-2">Entrada y Salida del Juez Virtual</h4>
+              <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-slate-400">
+                  <span class="text-[9px] text-slate-500 block mb-1">ENTRADA (Canicas)</span>
+                  5 2<br>1 3 3 3 1<br>2<br>3
+                </div>
+                <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-emerald-400">
+                  <span class="text-[9px] text-slate-500 block mb-1">SALIDA REAL</span>
+                  CASE# 1:<br>2 not found<br>3 found at 1
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB GLOSARIO SINTAXIS C++ ==================== -->
+    <section id="content-glosario" class="space-y-6 hidden">
+      <div class="glass-card rounded-2xl p-6 border-l-4 border-l-sky-500">
+        <h2 class="text-2xl font-bold text-white">Glosario Interactivo de Estructuras en C++</h2>
+        <p class="text-slate-400 text-sm mt-1">
+          Utiliza esta guía para responder las preguntas conceptuales del Dr. Ivar Vargas sobre el funcionamiento interno del lenguaje.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        
+        <!-- CARD FOR -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-sky-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-sky-400">for</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-300">Bucle Determinado</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Repite un bloque de código un número exacto de veces guiado por una variable contador (ej. <code class="text-sky-300">int i = 0; i &lt; n; i++</code>).
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            Uso: Recorrer arreglos de inicio a fin.
+          </div>
+        </div>
+
+        <!-- CARD WHILE -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-emerald-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-emerald-400">while</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300">Bucle Condicional</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Repite instrucciones **mientras** una condición lógica sea Verdadera (<code class="text-emerald-300">true</code>). No se sabe cuántas vueltas dará de antemano.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            Uso: Búsqueda binaria (reducir rango).
+          </div>
+        </div>
+
+        <!-- CARD IF / ELSE -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-amber-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-amber-400">if / else</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300">Bifurcación Lógica</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Toma decisiones en el programa. Si la prueba dentro de <code class="text-amber-300">if(...)</code> da verdadero entra a esa rama; si da falso salta al <code class="text-amber-300">else</code>.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            Uso: Evaluar si $A[i] == x$ o comparar pares.
+          </div>
+        </div>
+
+        <!-- CARD RETURN -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-red-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-red-400">return</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/10 text-red-300">Finalizador de Función</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Retorna un valor como resultado y **aborta/detiene inmediatamente** la ejecución de la función actual.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            ¡Cuidado! Si se coloca dentro de un for en la iteración 0, aborta todo el bucle.
+          </div>
+        </div>
+
+        <!-- CARD TEMP -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-purple-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-purple-400">temp</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-300">Variable Auxiliar</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Sirve de respaldo temporal en memoria para intercambiar dos variables sin sobrescribir ni perder el dato original.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            Fórmula: temp = A; A = B; B = temp;
+          </div>
+        </div>
+
+        <!-- CARD PARÁMETROS -->
+        <div class="glass-card p-5 rounded-2xl border border-slate-800 space-y-2 hover:border-sky-500/50 transition-all">
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-sky-400">Firma / Orden</span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-300">Parámetros</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Para qué sirve?</b> Las funciones en C++ son estrictas con el tipo y el orden de los datos que reciben. Intercambiarlos provoca errores de compilación o lecturas inválidas.
+          </p>
+          <div class="text-[11px] text-slate-400 bg-slate-950 p-2 rounded border border-slate-800 font-mono">
+            Ejemplo: mostrar(A, n) ≠ mostrar(n, A).
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800 bg-slate-950 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      Informe Técnico y Sustentación • Integrantes: Apaza, Ccolla, Gil, Mamani, Ventura • UNAJ 2026-II
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGIC FOR INTERACTIVITY -->
+  <script>
+    // DATA SOURCE FOR Q1 CODE
+    const q1CodeBugged = `
+<div class="text-slate-500">// 1. BUSQUEDA SECUENCIAL (CON ERRORES)</div>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">busquedaSecuencial</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n, <span class="text-purple-400">int</span> x) {</div>
+<div>  <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> i = <span class="text-amber-300">0</span>; i &lt; n; i++) {</div>
+<div>    <span class="text-purple-400">if</span> (A[i] == x) { <span class="text-purple-400">return</span> i; }</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q1-err1')">    <span class="text-purple-400">else</span> { <span class="text-purple-400">return</span> -<span class="text-amber-300">1</span>; } <span class="text-red-400 font-bold">[! ERROR 1: Aborta en i=0]</span></div>
+<div>  }</div>
+<div>  <span class="text-purple-400">return</span> -<span class="text-amber-300">1</span>;</div>
+<div>}</div>
+<br>
+<div class="text-slate-500">// 2. BUSQUEDA BINARIA (CON ERRORES)</div>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">busquedaBinaria</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n, <span class="text-purple-400">int</span> x) {</div>
+<div>  <span class="text-purple-400">int</span> izquierda = <span class="text-amber-300">0</span>, derecha = n - <span class="text-amber-300">1</span>;</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q1-err2')">  <span class="text-purple-400">while</span> (izquierda &lt; derecha) { <span class="text-red-400 font-bold">[! ERROR 2: Omite izq==der]</span></div>
+<div>    <span class="text-purple-400">int</span> medio = (izquierda + derecha) / <span class="text-amber-300">2</span>;</div>
+<div>    <span class="text-purple-400">if</span> (A[medio] == x) { <span class="text-purple-400">return</span> medio; }</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q1-err3')">    <span class="text-purple-400">if</span> (A[medio] &lt; x) { derecha = medio - <span class="text-amber-300">1</span>; } <span class="text-red-400 font-bold">[! ERROR 3: Lógica invertida]</span></div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q1-err4')">    <span class="text-purple-400">else</span> { izquierda = medio + <span class="text-amber-300">1</span>; } <span class="text-red-400 font-bold">[! ERROR 4: Lógica invertida]</span></div>
+<div>  }</div>
+<div>  <span class="text-purple-400">return</span> -<span class="text-amber-300">1</span>;</div>
+<div>}</div>
+<br>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">main</span>() {</div>
+<div>  <span class="text-purple-400">int</span> A[] = {<span class="text-amber-300">3, 7, 12, 18, 25, 31, 40</span>}; <span class="text-purple-400">int</span> n = <span class="text-amber-300">7</span>, x = <span class="text-amber-300">25</span>;</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q1-err5')">  busquedaSecuencial(A, x, n); <span class="text-red-400 font-bold">[! ERROR 5: x y n invertidos]</span></div>
+<div>  <span class="text-purple-400">return</span> <span class="text-amber-300">0</span>;</div>
+<div>}</div>`;
+
+    const q1CodeFixed = `
+<div class="text-emerald-400">// 1. BUSQUEDA SECUENCIAL (CORREGIDA)</div>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">busquedaSecuencial</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n, <span class="text-purple-400">int</span> x) {</div>
+<div>  <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> i = <span class="text-amber-300">0</span>; i &lt; n; i++) {</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">    <span class="text-purple-400">if</span> (A[i] == x) { <span class="text-purple-400">return</span> i; } <span class="text-emerald-400 font-bold">// Sin else. Recorre todo el arreglo</span></div>
+<div>  }</div>
+<div>  <span class="text-purple-400">return</span> -<span class="text-amber-300">1</span>;</div>
+<div>}</div>
+<br>
+<div class="text-emerald-400">// 2. BUSQUEDA BINARIA (CORREGIDA)</div>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">busquedaBinaria</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n, <span class="text-purple-400">int</span> x) {</div>
+<div>  <span class="text-purple-400">int</span> izquierda = <span class="text-amber-300">0</span>, derecha = n - <span class="text-amber-300">1</span>;</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">  <span class="text-purple-400">while</span> (izquierda &lt;= derecha) { <span class="text-emerald-400 font-bold">// Incluye el caso de un solo elemento</span></div>
+<div>    <span class="text-purple-400">int</span> medio = (izquierda + derecha) / <span class="text-amber-300">2</span>;</div>
+<div>    <span class="text-purple-400">if</span> (A[medio] == x) { <span class="text-purple-400">return</span> medio; }</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">    <span class="text-purple-400">if</span> (A[medio] &lt; x) { izquierda = medio + <span class="text-amber-300">1</span>; } <span class="text-emerald-400 font-bold">// Busca a la derecha</span></div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">    <span class="text-purple-400">else</span> { derecha = medio - <span class="text-amber-300">1</span>; } <span class="text-emerald-400 font-bold">// Busca a la izquierda</span></div>
+<div>  }</div>
+<div>  <span class="text-purple-400">return</span> -<span class="text-amber-300">1</span>;</div>
+<div>}</div>
+<br>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">main</span>() {</div>
+<div>  <span class="text-purple-400">int</span> A[] = {<span class="text-amber-300">3, 7, 12, 18, 25, 31, 40</span>}; <span class="text-purple-400">int</span> n = <span class="text-amber-300">7</span>, x = <span class="text-amber-300">25</span>;</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">  busquedaSecuencial(A, n, x); <span class="text-emerald-400 font-bold">// Parámetros en orden correcto (A, n, x)</span></div>
+<div>  <span class="text-purple-400">return</span> <span class="text-amber-300">0</span>;</div>
+<div>}</div>`;
+
+    // DATA SOURCE FOR Q2 CODE
+    const q2CodeBugged = `
+<div><span class="text-purple-400">void</span> <span class="text-blue-400">bubbleSort</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n) {</div>
+<div>  <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> i = <span class="text-amber-300">0</span>; i &lt; n - <span class="text-amber-300">1</span>; i++) {</div>
+<div>    <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> j = <span class="text-amber-300">0</span>; j &lt; n - i - <span class="text-amber-300">1</span>; j++) {</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q2-err1')">      <span class="text-purple-400">if</span> (A[j] &lt; A[j + <span class="text-amber-300">1</span>]) { <span class="text-red-400 font-bold">[! ERROR 1: Condición Descendente]</span></div>
+<div>        <span class="text-purple-400">int</span> temp = A[j];</div>
+<div>        A[j] = A[j + <span class="text-amber-300">1</span>];</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q2-err2')">        A[j + <span class="text-amber-300">1</span>] = A[j]; <span class="text-red-400 font-bold">[! ERROR 2: Pierde el respaldo en temp]</span></div>
+<div>      }</div>
+<div>    }</div>
+<div>  }</div>
+<div>}</div>
+<br>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">main</span>() {</div>
+<div>  <span class="text-purple-400">int</span> A[] = {<span class="text-amber-300">15, 8, 20, 4, 12</span>}, n = <span class="text-amber-300">5</span>;</div>
+<div>  bubbleSort(A, n);</div>
+<div class="bg-red-500/20 text-red-300 border-l-2 border-red-500 px-1 cursor-pointer" onclick="showDiag('q2-err3')">  mostrar(n, A); <span class="text-red-400 font-bold">[! ERROR 3: Error de Firma/Tipos]</span></div>
+<div>}</div>`;
+
+    const q2CodeFixed = `
+<div><span class="text-purple-400">void</span> <span class="text-blue-400">bubbleSort</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n) {</div>
+<div>  <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> i = <span class="text-amber-300">0</span>; i &lt; n - <span class="text-amber-300">1</span>; i++) {</div>
+<div>    <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> j = <span class="text-amber-300">0</span>; j &lt; n - i - <span class="text-amber-300">1</span>; j++) {</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">      <span class="text-purple-400">if</span> (A[j] &gt; A[j + <span class="text-amber-300">1</span>]) { <span class="text-emerald-400 font-bold">// Correcto: Orden Ascendente</span></div>
+<div>        <span class="text-purple-400">int</span> temp = A[j];</div>
+<div>        A[j] = A[j + <span class="text-amber-300">1</span>];</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">        A[j + <span class="text-amber-300">1</span>] = temp; <span class="text-emerald-400 font-bold">// Recupera el valor guardado</span></div>
+<div>      }</div>
+<div>    }</div>
+<div>  }</div>
+<div>}</div>
+<br>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">main</span>() {</div>
+<div>  <span class="text-purple-400">int</span> A[] = {<span class="text-amber-300">15, 8, 20, 4, 12</span>}, n = <span class="text-amber-300">5</span>;</div>
+<div>  bubbleSort(A, n);</div>
+<div class="bg-emerald-500/10 text-emerald-300 border-l-2 border-emerald-500 px-1">  mostrar(A, n); <span class="text-emerald-400 font-bold">// Firma correcta: (int A[], int n)</span></div>
+<div>}</div>`;
+
+    const q3CodeFull = `
+<div class="text-purple-400">// Q3: SOLUCIÓN COMPLETA UVA 10474 (C++ PURO)</div>
+<div><span class="text-purple-400">#include</span> <span class="text-amber-300">&lt;iostream&gt;</span></div>
+<div><span class="text-purple-400">using namespace</span> std;</div>
+<br>
+<div><span class="text-purple-400">void</span> <span class="text-blue-400">bubbleSort</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n) {</div>
+<div>  <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> i = <span class="text-amber-300">0</span>; i &lt; n - <span class="text-amber-300">1</span>; i++) {</div>
+<div>    <span class="text-purple-400">for</span> (<span class="text-purple-400">int</span> j = <span class="text-amber-300">0</span>; j &lt; n - i - <span class="text-amber-300">1</span>; j++) {</div>
+<div>      <span class="text-purple-400">if</span> (A[j] &gt; A[j + <span class="text-amber-300">1</span>]) {</div>
+<div>        <span class="text-purple-400">int</span> temp = A[j]; A[j] = A[j + <span class="text-amber-300">1</span>]; A[j + <span class="text-amber-300">1</span>] = temp;</div>
+<div>      }</div>
+<div>    }</div>
+<div>  }</div>
+<div>}</div>
+<br>
+<div><span class="text-purple-400">int</span> <span class="text-blue-400">busquedaBinariaPrimeraAparicion</span>(<span class="text-purple-400">int</span> A[], <span class="text-purple-400">int</span> n, <span class="text-purple-400">int</span> x) {</div>
+<div>  <span class="text-purple-400">int</span> izq = <span class="text-amber-300">0</span>, der = n - <span class="text-amber-300">1</span>, posicion = -<span class="text-amber-300">1</span>;</div>
+<div>  <span class="text-purple-400">while</span> (izq &lt;= der) {</div>
+<div>    <span class="text-purple-400">int</span> medio = (izq + der) / <span class="text-amber-300">2</span>;</div>
+<div class="bg-purple-500/20 text-purple-200 border-l-2 border-purple-400 px-1">    <span class="text-purple-400">if</span> (A[medio] == x) {</div>
+<div class="bg-purple-500/20 text-purple-200 border-l-2 border-purple-400 px-1">      posicion = medio; <span class="text-purple-400 font-bold">// Guarda coincidencia</span></div>
+<div class="bg-purple-500/20 text-purple-200 border-l-2 border-purple-400 px-1">      der = medio - <span class="text-amber-300">1</span>;   <span class="text-purple-400 font-bold">// Sigue buscando a la izq</span></div>
+<div class="bg-purple-500/20 text-purple-200 border-l-2 border-purple-400 px-1">    }</div>
+<div>    <span class="text-purple-400">else if</span> (A[medio] &lt; x) izq = medio + <span class="text-amber-300">1</span>;</div>
+<div>    <span class="text-purple-400">else</span> der = medio - <span class="text-amber-300">1</span>;</div>
+<div>  }</div>
+<div>  <span class="text-purple-400">return</span> posicion;</div>
+<div>}</div>`;
+
+    // INITIALIZATION & TAB SWITCHING
+    document.addEventListener('DOMContentLoaded', () => {
+      toggleQ1Mode('bugged');
+      toggleQ2Mode('bugged');
+      document.getElementById('q3-code-container').innerHTML = q3CodeFull;
+    });
+
+    function switchTab(tab) {
+      ['q1', 'q2', 'q3', 'glosario'].forEach(t => {
+        document.getElementById(`content-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        btn.classList.remove('bg-sky-600', 'text-white', 'shadow-md');
+        btn.classList.add('text-slate-400');
+      });
+
+      document.getElementById(`content-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      activeBtn.classList.add('bg-sky-600', 'text-white', 'shadow-md');
+      activeBtn.classList.remove('text-slate-400');
+    }
+
+    function toggleQ1Mode(mode) {
+      const container = document.getElementById('q1-code-container');
+      const title = document.getElementById('q1-file-title');
+      const badge = document.getElementById('q1-status-badge');
+      const btnBugged = document.getElementById('q1-btn-bugged');
+      const btnFixed = document.getElementById('q1-btn-fixed');
+
+      if (mode === 'bugged') {
+        container.innerHTML = q1CodeBugged;
+        title.innerText = 'Evaluacion_Q1_Defectuoso.cpp';
+        badge.innerText = '5 ERRORES LÓGICOS';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30';
+        btnBugged.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-500/20 text-red-400 border border-red-500/30';
+        btnFixed.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
+      } else {
+        container.innerHTML = q1CodeFixed;
+        title.innerText = 'Evaluacion_Q1_Corregido.cpp';
+        badge.innerText = 'CÓDIGO OPTIMIZADO';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        btnFixed.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        btnBugged.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
+      }
+    }
+
+    function toggleQ2Mode(mode) {
+      const container = document.getElementById('q2-code-container');
+      const title = document.getElementById('q2-file-title');
+      const badge = document.getElementById('q2-status-badge');
+      const btnBugged = document.getElementById('q2-btn-bugged');
+      const btnFixed = document.getElementById('q2-btn-fixed');
+
+      if (mode === 'bugged') {
+        container.innerHTML = q2CodeBugged;
+        title.innerText = 'BubbleSort_Defectuoso.cpp';
+        badge.innerText = '3 ERRORES CLAVE';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30';
+        btnBugged.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-red-500/20 text-red-400 border border-red-500/30';
+        btnFixed.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
+      } else {
+        container.innerHTML = q2CodeFixed;
+        title.innerText = 'BubbleSort_Corregido.cpp';
+        badge.innerText = 'ORDENAMIENTO CORRECTO';
+        badge.className = 'text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        btnFixed.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+        btnBugged.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white';
+      }
+    }
+
+    // DIAGNOSTIC CARD CLICK HANDLERS
+    function showDiag(type) {
+      const diag = document.getElementById('q1-diagnostic-card');
+      const diagQ2 = document.getElementById('q2-diagnostic-card');
+
+      if (type === 'q1-err1') {
+        diag.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 1: Retorno Prematuro en Búsqueda Secuencial
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>¿Qué hace <code class="text-sky-300">else return -1;</code> aquí?</b><br>
+            Al estar dentro del ciclo <code class="text-sky-300">for</code>, si el primer elemento <code class="text-sky-300">A[0] = 3</code> no es igual a <code class="text-sky-300">25</code>, ejecuta el <code class="text-sky-300">else</code> y aborta la función inmediatamente.
+          </p>
+          <div class="p-2 bg-emerald-950/60 border border-emerald-800/80 rounded text-xs text-emerald-300">
+            <b>Solución:</b> Eliminar el <code class="text-emerald-200">else</code>. Dejar que el ciclo revise todos los índices.
+          </div>`;
+      } else if (type === 'q1-err2') {
+        diag.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 2: Condición del While en Binaria
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>Uso de <code class="text-sky-300">while (izquierda < derecha)</code>:</b><br>
+            Excluye el instante cuando <code class="text-sky-300">izquierda == derecha</code>. En ese punto queda 1 casilla por verificar.
+          </p>
+          <div class="p-2 bg-emerald-950/60 border border-emerald-800/80 rounded text-xs text-emerald-300">
+            <b>Solución:</b> Cambiar a <code class="text-emerald-200">while (izquierda <= derecha)</code>.
+          </div>`;
+      } else if (type === 'q1-err3' || type === 'q1-err4') {
+        diag.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Errores 3 y 4: Inversión de Punteros
+          </div>
+          <p class="text-xs text-slate-300">
+            <b>Falla Lógica:</b> Si <code class="text-sky-300">A[medio] < x</code>, el número está a la derecha, por lo que debe hacerse <code class="text-sky-300">izquierda = medio + 1</code>. El código original hacía lo opuesto y descartaba la mitad correcta.
+          </p>`;
+      } else if (type === 'q1-err5') {
+        diag.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 5: Parámetros Invertidos en main()
+          </div>
+          <p class="text-xs text-slate-300">
+            Invocaban <code class="text-sky-300">busquedaSecuencial(A, x, n)</code> enviando <code class="text-sky-300">x=25</code> como tamaño del arreglo. Esto causaba un bucle desbordado fuera de memoria.
+          </p>`;
+      } else if (type === 'q2-err1') {
+        diagQ2.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 1: Signo de Orden Invertido
+          </div>
+          <p class="text-xs text-slate-300">
+            El signo <code class="text-sky-300">&lt;</code> intercambiaba elementos si el izquierdo era menor, ordenando de forma **Descendente**. Cambiamos a <code class="text-sky-300">&gt;</code> para orden **Ascendente**.
+          </p>`;
+      } else if (type === 'q2-err2') {
+        diagQ2.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 2: Pérdida del valor temp
+          </div>
+          <p class="text-xs text-slate-300">
+            Hacían <code class="text-sky-300">A[j+1] = A[j]</code> perdiendo el respaldo. Se corrigió a <code class="text-emerald-300">A[j+1] = temp;</code>.
+          </p>`;
+      } else if (type === 'q2-err3') {
+        diagQ2.innerHTML = `
+          <div class="text-red-400 font-bold text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i> Error 3: Firma de Función Inválida
+          </div>
+          <p class="text-xs text-slate-300">
+            Llamaban <code class="text-sky-300">mostrar(n, A)</code> mandando un entero donde se esperaba el arreglo. C++ no compila esto.
+          </p>`;
+      }
+    }
+  </script>
+</body>
+</html>
